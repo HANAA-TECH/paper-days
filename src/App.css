@@ -1,0 +1,529 @@
+/*
+ * Paper Days — styles.
+ *
+ * Colors are defined once as CSS variables for two themes (light "paper" and
+ * "night"), straight from the design tokens in CLAUDE.md. Everything below
+ * uses var(--…) so switching themes recolors the whole app at once.
+ */
+
+/* --- Light "paper" theme (the default) --- */
+:root {
+  --paper: #f7f1e3;
+  --dotgrid: #dad0b9;
+  --border: #e4d9c0;
+  --ink: #3c372d;
+  --muted: #94886b;
+
+  --raise: #ffffff; /* a lifted surface on hover */
+  --hover: #f0e8d4; /* subtle button hover */
+  --panel: #f3ecda; /* the sticker/washi tray */
+  --media-bg: #efe7d3;
+  --card-bg: rgba(247, 241, 227, 0.9);
+  --input-bg: rgba(247, 241, 227, 0.7);
+  --input-bg-strong: rgba(247, 241, 227, 0.95);
+  --cell-bg: rgba(247, 241, 227, 0.6);
+  --today-bg: rgba(236, 192, 154, 0.35);
+
+  /* Accents — shared by both themes */
+  --rose: #ca8a83;
+  --rose-hover: #bd7c75;
+  --sage: #c7d6cb;
+  --peach: #ecc09a;
+  --blue: #9db2c4;
+  --amber: #f2d49a;
+  --lilac: #d9c6e0;
+  --on-accent: #ffffff;
+}
+
+/* --- Night theme --- */
+[data-theme="night"] {
+  --paper: #262320;
+  --dotgrid: #3a352b;
+  --border: #3a352b;
+  --ink: #e8e2d4;
+  --muted: #9e947c;
+
+  --raise: #322e28;
+  --hover: #322e28;
+  --panel: #2e2a25;
+  --media-bg: #322e28;
+  --card-bg: rgba(38, 35, 32, 0.9);
+  --input-bg: rgba(38, 35, 32, 0.6);
+  --input-bg-strong: rgba(38, 35, 32, 0.9);
+  --cell-bg: rgba(38, 35, 32, 0.5);
+  --today-bg: rgba(236, 192, 154, 0.18);
+
+  --rose-hover: #d59b94;
+  --on-accent: #2a2722;
+}
+
+/* --- Reset the page so our paper fills the whole window --- */
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* --- A full-window centered area with the faint journal dot grid --- */
+.screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  background-image: radial-gradient(var(--dotgrid) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* --- The card that holds the content --- */
+.card {
+  max-width: 560px;
+  text-align: center;
+  padding: 44px 48px;
+  border-radius: 12px;
+  border: 0.5px solid var(--border);
+  background-color: var(--card-bg);
+}
+
+.weekday {
+  margin: 0 0 4px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.title {
+  margin: 0 0 18px;
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.title-sm {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.muted {
+  margin: 10px 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* --- Buttons --- */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+.btn {
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 0.5px solid var(--border);
+  background-color: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn:hover {
+  background-color: var(--hover);
+}
+
+.btn-primary {
+  background-color: var(--rose);
+  border-color: var(--rose);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: var(--rose-hover);
+}
+
+/* --- The little "default path" hint and folder path display --- */
+.path-hint {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+/* --- The key/value list on the "ready" screen --- */
+.info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  text-align: left;
+  margin: 20px auto;
+  max-width: 460px;
+}
+
+.info dt {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.info dd {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.mono,
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  word-break: break-all;
+}
+
+/* ==========================================================================
+ * The daily page
+ * ======================================================================== */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* --- Date header: big day number + weekday + month --- */
+.page-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 22px 28px 14px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.page-back {
+  align-self: center;
+}
+
+.page-theme {
+  align-self: center;
+  margin-left: auto;
+}
+
+.page-daynum {
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.page-headtext {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-weekday {
+  font-size: 20px;
+  color: var(--ink);
+}
+
+.page-month {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* --- The canvas where notes are placed --- */
+.page-canvas {
+  position: relative;
+  flex: 1;
+  overflow: auto;
+  background-image: radial-gradient(var(--dotgrid) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.canvas-hint {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  pointer-events: none;
+}
+
+/* --- A single text note --- */
+.text-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  cursor: grab; /* hints that you can drag it */
+}
+
+.text-item.selected {
+  cursor: move;
+}
+
+.text-input {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--input-bg);
+  color: var(--ink);
+  /* The user's own writing gets the Caveat handwriting font. */
+  font-family: "Caveat", "Segoe Script", cursive;
+  font-size: 23px;
+  line-height: 1.3;
+  resize: none; /* sizing is handled by the move handles */
+  outline: none;
+  overflow: hidden;
+}
+
+.text-item.selected .text-input {
+  border-color: var(--rose);
+  background-color: var(--input-bg-strong);
+}
+
+/* --- Photos and video --- */
+.media-img,
+.media-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* fill the box without squishing */
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background-color: var(--media-bg);
+}
+
+.text-item.selected .media-img,
+.text-item.selected .media-video {
+  border-color: var(--rose);
+}
+
+/* --- Stickers and washi tape (no frame, transparent background) --- */
+.media-sticker {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* show the whole shape */
+}
+
+.media-washi {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill; /* stretch like a strip of tape */
+  opacity: 0.92;
+}
+
+/* --- The sticker/washi tray above the toolbar --- */
+.library-panel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  border-top: 0.5px solid var(--border);
+  background-color: var(--panel);
+}
+
+.library-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  padding: 6px;
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--paper);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.library-thumb:hover {
+  border-color: var(--rose);
+  background-color: var(--raise);
+}
+
+.library-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.library-import {
+  flex: 0 0 auto;
+  margin-left: auto;
+  align-self: center;
+}
+
+/* A toolbar button that's currently "on" (its tray is open). */
+.btn-active {
+  background-color: var(--peach);
+  border-color: var(--peach);
+  color: #3c372d;
+}
+
+/* ==========================================================================
+ * The month calendar
+ * ======================================================================== */
+
+.cal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 22px 28px 28px;
+}
+
+.cal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cal-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cal-arrow {
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 14px;
+}
+
+.cal-today {
+  margin-left: auto;
+}
+
+/* Weekday header row */
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cal-weekday {
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The day grid fills the rest of the window */
+.cal-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 8px;
+}
+
+.cal-blank {
+  /* empty leading cell */
+}
+
+.cal-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--cell-bg);
+  color: var(--ink);
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.cal-day:hover {
+  background-color: var(--raise);
+  border-color: var(--rose);
+}
+
+.cal-daynum {
+  font-size: 15px;
+}
+
+/* Today: a gentle peach highlight */
+.cal-day.is-today {
+  background-color: var(--today-bg);
+  border-color: var(--peach);
+}
+
+/* A small marker when a day has an entry but no photo */
+.cal-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background-color: var(--rose);
+}
+
+/* A photo peeking through for days with an image */
+.cal-thumb {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  height: 46%;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 0.5px solid var(--border);
+}
+
+/* --- The optional daily quote, pinned above the toolbar --- */
+.quote-bar {
+  padding: 12px 24px;
+  text-align: center;
+  border-top: 0.5px solid var(--border);
+  background-color: var(--paper);
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* --- Bottom toolbar --- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 0.5px solid var(--border);
+  background-color: var(--paper);
+}
+
+.toolbar-divider {
+  width: 0.5px;
+  align-self: stretch;
+  margin: 2px 4px;
+  background-color: var(--border);
+}
