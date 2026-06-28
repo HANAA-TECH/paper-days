@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/social-preview.png" alt="Paper Days" width="720"/>
+</p>
+
 # 📓 Paper Days
 
 A warm, **Hobonichi-style journaling app** for your desktop. Quiet paper, your
